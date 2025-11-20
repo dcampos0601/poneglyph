@@ -1,0 +1,152 @@
+// TODO for Codex:
+// - Confirm AccountList → Account is 1:N and Account → Lead is 1:N.
+// - Keep PostgreSQL + env("DATABASE_URL") as configured.
+// - Ensure useful indexes remain on accountListId, playerType, market, and lead filters.
+// - Keep schema focused (Contacts/Routes can be added later).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* --- ENUMS --- */
+
+enum PlayerType {
+  ASSET_MANAGER
+  DEVELOPER
+  FAMILY_OFFICE
+  OTHER
+}
+
+enum AumBucket {
+  LT_1B
+  AUM_1_3B
+  AUM_3_5B
+  GT_5B
+}
+
+enum LeadRouteType {
+  WARM
+  DIRECT_AFFINITY
+  COLD
+}
+
+enum LeadWorkStatus {
+  PENDING
+  IN_PROGRESS
+  CLOSED_IN_HUBSPOT
+  LOST
+}
+
+enum LeadPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+/* --- MODELS --- */
+
+/**
+ * Optional: agrupa imports (Preqin, SFR, etc.)
+ */
+model AccountList {
+  id        String    @id @default(cuid())
+  name      String
+  source    String
+  notes     String?   @db.Text
+  createdAt DateTime  @default(now())
+
+  accounts  Account[]
+}
+
+/**
+ * ICP completo del jugador institucional
+ */
+model Account {
+  id        String   @id @default(cuid())
+
+  // Relación opcional a AccountList de origen
+  accountListId String?
+  accountList   AccountList? @relation(fields: [accountListId], references: [id])
+
+  // Identidad
+  name     String
+  website  String?
+  market   String?  // ej: "US - Sunbelt"
+  country  String?  // ej: "US"
+
+  // Tipo de jugador (clave para PlayerType)
+  playerType PlayerType
+
+  // ICP flags
+  residentialOperation Boolean?
+  multifamilyExposure  Boolean?
+  affordableOnly       Boolean?
+  sunbeltFlag          Boolean?
+
+  // Scoring
+  aumBucket AumBucket?
+  fitScore  Int?
+
+  // Meta
+  sourceList   String?
+  notesAnalyst String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads     Lead[]
+
+  @@index([accountListId])
+  @@index([playerType])
+  @@index([market])
+}
+
+/**
+ * Lead individual que trabaja la Sales Console (/sales)
+ */
+model Lead {
+  id        String   @id @default(cuid())
+
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  // Datos del contacto
+  fullName    String
+  title       String?
+  email       String?
+  linkedinUrl String?
+
+  market   String? // podemos sobreescribir el del account si hace falta
+  fitScore Int?   // copia simple del account.fitScore si quieres
+
+  // Routing
+  routeType LeadRouteType
+  leadOwner String
+  priority  LeadPriority @default(MEDIUM)
+
+  // Estado operativo para Sales Console (no CRM)
+  workStatus    LeadWorkStatus @default(PENDING)
+  lastTouchDate DateTime?
+
+  // HubSpot (solo lectura / links)
+  hubspotContactId  String?
+  hubspotContactUrl String?
+
+  // Meta
+  sourceList    String?
+  internalNotes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId])
+  @@index([leadOwner])
+  @@index([routeType])
+  @@index([workStatus])
+  @@index([priority])
+}

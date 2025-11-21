@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
-    const owner = searchParams.get("owner") ?? undefined;
+    const rawOwner = searchParams.get("owner");
+    const owner = rawOwner && rawOwner.toLowerCase() !== "all" ? rawOwner : undefined;
 
     const routeTypeRaw = searchParams.get("routeType");
     const routeType = routeTypeRaw ? (routeTypeRaw as LeadRouteType) : undefined;
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ leads });
   } catch (err) {
     console.error("GET /api/leads error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    // Fail-soft to avoid breaking the UI; surface a friendly message client-side if needed
+    return NextResponse.json({ leads: [], error: "Failed to load leads" }, { status: 500 });
   }
 }

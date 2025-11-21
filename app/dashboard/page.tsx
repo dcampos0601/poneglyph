@@ -72,9 +72,18 @@ export default function BossDashboard() {
           <p className="text-slate-500">Priority Queue • {new Date().toLocaleDateString()}</p>
         </div>
         <div className="flex gap-3">
-           <Link href="/sales" className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-             View Full Console
-           </Link>
+          <Link
+            href="/sales"
+            className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            Executive Dashboard
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+          >
+            Back to Main
+          </Link>
         </div>
       </header>
 

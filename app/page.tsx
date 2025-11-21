@@ -1,4 +1,4 @@
-﻿"use client";
+﻿﻿﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -184,7 +184,7 @@ export default function SalesConsolePage() {
                 <header className="border-b bg-white">
           <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-6 py-6">
             <div className="space-y-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-slate-900">
                 Poneglyph • SDR Workspace
               </p>
               <h1 className="text-3xl font-bold text-slate-950 leading-tight">
@@ -568,6 +568,9 @@ export default function SalesConsolePage() {
     </div>
   );
 }
+
+
+
 
 
 

@@ -210,33 +210,39 @@ export default function SalesConsolePage() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <main>
         <header className="border-b bg-white">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Andes STR - Internal
+          <div className="mx-auto flex max-w-6xl items-start justify-between gap-8 px-6 py-6">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                Poneglyph • SDR Workspace
               </p>
-              <h1 className="text-xl font-semibold text-slate-900">
-                Poneglyph - Sales Console
+              <h1 className="text-3xl font-bold text-slate-900 leading-tight">
+                Sales Console
               </h1>
               <p className="text-sm text-slate-500">
-                Cola de leads priorizados por owner, player type e ICP.
+                Today&apos;s prioritized queue for institutional leads with clear ownership and status.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                Executive Dashboard
+              </Link>
               <Link
                 href="/"
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
               >
-                Account Discovery
+                Back to Main
               </Link>
-            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
-              <label className="text-xs uppercase tracking-wide text-slate-500">
-                Current owner
-              </label>
-              <select
-                value={owner}
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
+                <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  Current user
+                </label>
+                <select
+                  value={owner}
                   onChange={(e) => setOwner(e.target.value)}
-                  className="border border-slate-200 rounded-md px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
                 >
                   {OWNERS.map((o) => (
                     <option key={o} value={o}>

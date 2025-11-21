@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -181,46 +181,48 @@ export default function SalesConsolePage() {
   return (
     <div className="flex min-h-screen bg-slate-100 text-slate-900">
       <main className="flex-1 px-8 py-10">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-500">
-              Poneglyph · SDR Workspace
-            </p>
-            <h1 className="text-3xl font-bold text-slate-950 leading-tight">
-              Sales Console / My Leads
-            </h1>
-            <p className="text-sm text-slate-500">
-              Prioritized queue powered by Google Sheets + HubSpot. Work faster with clear ownership and status.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm hover:bg-blue-100 transition-colors"
-            >
-              Executive Dashboard
-            </Link>
-            <Link
-              href="/sales"
-              className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
-            >
-              Open Sales Console
-            </Link>
-            <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Current User
-              </label>
-              <select
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-800 focus:border-blue-500 focus:outline-none"
-                value={currentOwner}
-                onChange={(event) => setCurrentOwner(event.target.value)}
+                <header className="border-b bg-white">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-6 py-6">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+                Poneglyph • SDR Workspace
+              </p>
+              <h1 className="text-3xl font-bold text-slate-950 leading-tight">
+                Sales Console / My Leads
+              </h1>
+              <p className="text-sm text-slate-500">
+                Today&apos;s prioritized queue for institutional leads with clear ownership and status.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
               >
-                {ownerOptions.map((owner) => (
-                  <option key={owner} value={owner}>
-                    {owner}
-                  </option>
-                ))}
-              </select>
+                Executive Dashboard
+              </Link>
+              <Link
+                href="/sales"
+                className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                Open Sales Console
+              </Link>
+              <div className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-slate-200">
+                <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  Current User
+                </label>
+                <select
+                  className="rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-800 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300"
+                  value={currentOwner}
+                  onChange={(event) => setCurrentOwner(event.target.value)}
+                >
+                  {ownerOptions.map((owner) => (
+                    <option key={owner} value={owner}>
+                      {owner}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </header>
@@ -566,3 +568,7 @@ export default function SalesConsolePage() {
     </div>
   );
 }
+
+
+
+

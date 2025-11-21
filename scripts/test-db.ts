@@ -12,7 +12,7 @@
  *   or transpile to plain JS and run with node.
  */
 
-import { PrismaClient, FitScoreBand } from "@prisma/client";
+import { PrismaClient, AumBucket, PlayerType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -32,18 +32,16 @@ async function main() {
       accountListId: accountList.id,
       name: "Test Account",
       website: "https://example.dev",
-      aumRaw: 5000000000,
-      aumConfidence: 0.85,
-      isRealEstate: true,
-      residentialConfidence: 0.9,
-      isMultifamily: true,
-      multifamilyConfidence: 0.8,
-      hasSunbelt: false,
-      sunbeltConfidence: 0.1,
-      isAffordableOnly: false,
-      affordableOnlyConfidence: 0.2,
-      fitScoreNumeric: 4,
-      fitScoreBand: FitScoreBand.HIGH,
+      playerType: PlayerType.ASSET_MANAGER,
+      residentialOperation: true,
+      multifamilyExposure: true,
+      affordableOnly: false,
+      sunbeltFlag: false,
+      aumBucket: AumBucket.AUM_1_3B,
+      fitScore: 80,
+      market: "US - Sunbelt",
+      country: "US",
+      sourceList: "local-dev-script",
     },
   });
 

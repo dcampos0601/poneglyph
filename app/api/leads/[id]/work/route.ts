@@ -6,13 +6,11 @@ type RouteParams = { id: string } & Record<string, string>;
 function extractId(req: NextRequest, params: Partial<RouteParams>) {
   const fromParams =
     params.id ??
-    // support alternative folder names like [leadId]
     (params as Record<string, string | undefined>).leadId ??
     Object.values(params).find(Boolean);
 
   if (fromParams) return fromParams;
 
-  // Fallback: derive from URL path /api/leads/:id/work
   const { pathname } = new URL(req.url);
   const segments = pathname.split("/").filter(Boolean);
   const leadsIndex = segments.indexOf("leads");
@@ -40,7 +38,13 @@ export async function POST(
 
     const lead = await markLeadWorkedToday(id);
 
-    return NextResponse.json({ lead });
+    // Placeholder for HubSpot sync
+    if (lead.hubspotContactId) {
+      console.log(`[PENDING] Would sync Lead ${id} to HubSpot ID ${lead.hubspotContactId}`);
+      // await updateHubSpotContact(...)
+    }
+
+    return NextResponse.json({ lead, success: true });
   } catch (error) {
     console.error("Error in POST /api/leads/[id]/work:", error);
     return NextResponse.json(

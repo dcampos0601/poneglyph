@@ -182,18 +182,24 @@ export default function SalesConsolePage() {
     <div className="flex min-h-screen bg-slate-100 text-slate-900">
       <main className="flex-1 px-8 py-10">
         <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-blue-500">
-              Poneglyph
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-500">
+              Poneglyph · SDR Workspace
             </p>
-            <h1 className="text-3xl font-semibold text-slate-900">
+            <h1 className="text-3xl font-bold text-slate-950 leading-tight">
               Sales Console / My Leads
             </h1>
             <p className="text-sm text-slate-500">
-              Today&apos;s prioritized queue sourced from Google Sheets + HubSpot.
+              Prioritized queue powered by Google Sheets + HubSpot. Work faster with clear ownership and status.
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm hover:bg-blue-100 transition-colors"
+            >
+              Executive Dashboard
+            </Link>
             <Link
               href="/sales"
               className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"

@@ -76,13 +76,13 @@ export default function BossDashboard() {
             href="/sales"
             className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
           >
-            Executive Dashboard
+            Sales Console
           </Link>
           <Link
             href="/"
             className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
-            Sales Console
+            Main
           </Link>
         </div>
       </header>

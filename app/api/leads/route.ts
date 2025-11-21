@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
-    const owner = searchParams.get("owner") ?? undefined;
+    const owner = searchParams.get("owner");
     if (!owner) {
       return NextResponse.json({ error: "Missing owner parameter" }, { status: 400 });
     }
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
     const market = searchParams.get("market") ?? undefined;
 
     const minFitScoreParam = searchParams.get("minFitScore");
-    const minFitScore = minFitScoreParam ? Number(minFitScoreParam) : undefined;
+    const minFitScoreParsed = minFitScoreParam ? Number(minFitScoreParam) : undefined;
+    const minFitScore = Number.isFinite(minFitScoreParsed) ? minFitScoreParsed : undefined;
 
     const playerTypes = parseEnumList<PlayerType>(searchParams.get("playerTypes"));
 

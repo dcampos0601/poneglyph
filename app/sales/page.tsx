@@ -5,7 +5,12 @@ import Link from 'next/link';
 
 type RouteType = 'WARM' | 'DIRECT_AFFINITY' | 'COLD';
 type WorkStatus = 'PENDING' | 'IN_PROGRESS' | 'CLOSED_IN_HUBSPOT' | 'LOST';
-type PlayerType = 'ASSET_MANAGER' | 'DEVELOPER' | 'FAMILY_OFFICE' | 'OTHER';
+type PlayerType =
+  | 'ASSET_MANAGER'
+  | 'PROPERTY_MANAGEMENT'
+  | 'DEVELOPER'
+  | 'FAMILY_OFFICE'
+  | 'OTHER';
 
 type Lead = {
   id: string;
@@ -44,6 +49,16 @@ type GetLeadsResponse = {
 
 const OWNERS = ['Martin', 'Capitan', 'Lucia', 'Miguel', 'Other'];
 
+const PLAYER_FILTERS: Array<{ value: PlayerType | 'ALL'; label: string }> = [
+  { value: 'ASSET_MANAGER', label: 'Asset Manager' },
+  { value: 'PROPERTY_MANAGEMENT', label: 'Property Management' },
+  { value: 'DEVELOPER', label: 'Developer' },
+  { value: 'FAMILY_OFFICE', label: 'Family Office' },
+  { value: 'OTHER', label: 'Other' },
+  { value: 'ALL', label: 'All Players' },
+];
+
+
 const routeLabel: Record<RouteType, string> = {
   WARM: 'Warm intro',
   DIRECT_AFFINITY: 'Affinity',
@@ -55,6 +70,22 @@ const statusLabel: Record<WorkStatus, string> = {
   IN_PROGRESS: 'In progress',
   CLOSED_IN_HUBSPOT: 'Closed in HubSpot',
   LOST: 'Lost',
+};
+
+const playerTypeLabel: Record<PlayerType, string> = {
+  ASSET_MANAGER: 'Asset Manager',
+  PROPERTY_MANAGEMENT: 'Property Mgmt',
+  DEVELOPER: 'Developer',
+  FAMILY_OFFICE: 'Family Office',
+  OTHER: 'Other',
+};
+
+const playerTypeClasses: Record<PlayerType, string> = {
+  ASSET_MANAGER: 'bg-slate-100 text-slate-700 border border-slate-200',
+  PROPERTY_MANAGEMENT: 'bg-blue-50 text-blue-700 border border-blue-200',
+  DEVELOPER: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+  FAMILY_OFFICE: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  OTHER: 'bg-slate-50 text-slate-700 border border-slate-200',
 };
 
 const statusClasses = (status: WorkStatus) => {
@@ -91,6 +122,11 @@ export default function SalesConsolePage() {
   const [loading, setLoading] = useState(false);
   const [workingId, setWorkingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [playerFilter, setPlayerFilter] = useState<PlayerType | 'ALL'>('ALL');
+
+  const filteredLeads = leads.filter((lead) =>
+    playerFilter === 'ALL' ? true : lead.account.playerType === playerFilter,
+  );
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -176,10 +212,10 @@ export default function SalesConsolePage() {
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Andes STR · Internal
+                Andes STR - Internal
               </p>
               <h1 className="text-xl font-semibold text-slate-900">
-                Poneglyph – Sales Console
+                Poneglyph - Sales Console
               </h1>
               <p className="text-sm text-slate-500">
                 Cola de leads priorizados por owner, player type e ICP.
@@ -213,6 +249,26 @@ export default function SalesConsolePage() {
         </header>
 
         <div className="max-w-6xl mx-auto px-6 py-10 space-y-6">
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Filters
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500">Player Type</span>
+              <select
+                value={playerFilter}
+                onChange={(e) => setPlayerFilter(e.target.value as PlayerType | 'ALL')}
+                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              >
+                {PLAYER_FILTERS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {error && (
             <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
               {error}
@@ -233,12 +289,12 @@ export default function SalesConsolePage() {
               )}
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500">
-                  <tr>
-                    <th className="px-4 py-2 text-left">Account</th>
-                    <th className="px-4 py-2 text-left">Player</th>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-4 py-2 text-left">Account</th>
+                  <th className="px-4 py-2 text-left">Player</th>
                     <th className="px-4 py-2 text-left">Lead</th>
                     <th className="px-4 py-2 text-left">Market</th>
                     <th className="px-4 py-2 text-left">Route</th>
@@ -249,7 +305,7 @@ export default function SalesConsolePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {leads.length === 0 && !loading && (
+                  {filteredLeads.length === 0 && !loading && (
                     <tr>
                       <td
                         colSpan={9}
@@ -260,7 +316,7 @@ export default function SalesConsolePage() {
                     </tr>
                   )}
 
-                  {leads.map((lead) => (
+                  {filteredLeads.map((lead) => (
                     <tr
                       key={lead.id}
                       className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
@@ -274,8 +330,10 @@ export default function SalesConsolePage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
-                        <span className="inline-flex items-center rounded-full px-2 py-1 text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                          {lead.account.playerType.replace('_', ' ')}
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-[11px] font-semibold ${playerTypeClasses[lead.account.playerType]}`}
+                        >
+                          {playerTypeLabel[lead.account.playerType]}
                         </span>
                       </td>
                       <td className="px-4 py-3 align-top">
@@ -284,6 +342,9 @@ export default function SalesConsolePage() {
                         </div>
                         <div className="text-xs text-slate-500">
                           {lead.title ?? '-'}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          Owner: {lead.leadOwner || 'Unassigned'}
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">

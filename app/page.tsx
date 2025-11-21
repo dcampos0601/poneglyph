@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { Lead, RouteType, FitScoreLevel, WorkStatus } from "@/lib/sheets";
 import {
@@ -192,21 +193,29 @@ export default function SalesConsolePage() {
               Today&apos;s prioritized queue sourced from Google Sheets + HubSpot.
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
-            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Current User
-            </label>
-            <select
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-800 focus:border-blue-500 focus:outline-none"
-              value={currentOwner}
-              onChange={(event) => setCurrentOwner(event.target.value)}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/sales"
+              className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
             >
-              {ownerOptions.map((owner) => (
-                <option key={owner} value={owner}>
-                  {owner}
-                </option>
-              ))}
-            </select>
+              Open Sales Console
+            </Link>
+            <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
+              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Current User
+              </label>
+              <select
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-800 focus:border-blue-500 focus:outline-none"
+                value={currentOwner}
+                onChange={(event) => setCurrentOwner(event.target.value)}
+              >
+                {ownerOptions.map((owner) => (
+                  <option key={owner} value={owner}>
+                    {owner}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </header>
 

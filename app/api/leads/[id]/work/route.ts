@@ -22,11 +22,11 @@ function extractId(req: NextRequest, params: Partial<RouteParams>) {
 
 export async function POST(
   req: NextRequest,
-  context: { params: RouteParams },
+  context: { params: Promise<RouteParams> | RouteParams },
 ) {
   try {
-    const params = context.params || {};
-    const id = extractId(req, params);
+    const params = await (context.params as Promise<RouteParams>);
+    const id = extractId(req, params ?? {});
 
     if (!id) {
       console.error("POST /api/leads/[id]/work called without valid id. Params:", params);
@@ -38,10 +38,8 @@ export async function POST(
 
     const lead = await markLeadWorkedToday(id);
 
-    // Placeholder for HubSpot sync
     if (lead.hubspotContactId) {
       console.log(`[PENDING] Would sync Lead ${id} to HubSpot ID ${lead.hubspotContactId}`);
-      // await updateHubSpotContact(...)
     }
 
     return NextResponse.json({ lead, success: true });

@@ -68,7 +68,7 @@ export default function BossDashboard() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Executive Command</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Executive Dashboard</h1>
           <p className="text-slate-500">Priority Queue • {new Date().toLocaleDateString()}</p>
         </div>
         <div className="flex gap-3">
@@ -82,7 +82,7 @@ export default function BossDashboard() {
             href="/"
             className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
-            Back to Main
+            Sales Console
           </Link>
         </div>
       </header>

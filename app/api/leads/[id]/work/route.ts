@@ -1,22 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
 import { markLeadWorkedToday } from "@/lib/db";
 
-type Params = {
-  params: { id: string };
-};
+type RouteParams = { id: string } & Record<string, string>;
 
-export async function POST(_req: NextRequest, { params }: Params) {
-  const { id } = params;
+function extractId(req: NextRequest, params: Partial<RouteParams>) {
+  const fromParams =
+    params.id ??
+    // support alternative folder names like [leadId]
+    (params as Record<string, string | undefined>).leadId ??
+    Object.values(params).find(Boolean);
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing lead id" }, { status: 400 });
+  if (fromParams) return fromParams;
+
+  // Fallback: derive from URL path /api/leads/:id/work
+  const { pathname } = new URL(req.url);
+  const segments = pathname.split("/").filter(Boolean);
+  const leadsIndex = segments.indexOf("leads");
+  if (leadsIndex >= 0 && segments[leadsIndex + 1]) {
+    return segments[leadsIndex + 1];
   }
+  return undefined;
+}
 
+export async function POST(
+  req: NextRequest,
+  context: { params: RouteParams },
+) {
   try {
-    const updated = await markLeadWorkedToday(id);
-    return NextResponse.json({ lead: updated });
-  } catch (err) {
-    console.error(`POST /api/leads/${id}/work error:`, err);
-    return NextResponse.json({ error: "Could not update lead" }, { status: 500 });
+    const params = context.params || {};
+    const id = extractId(req, params);
+
+    if (!id) {
+      console.error("POST /api/leads/[id]/work called without valid id. Params:", params);
+      return NextResponse.json(
+        { error: "Missing lead id in route params" },
+        { status: 400 },
+      );
+    }
+
+    const lead = await markLeadWorkedToday(id);
+
+    return NextResponse.json({ lead });
+  } catch (error) {
+    console.error("Error in POST /api/leads/[id]/work:", error);
+    return NextResponse.json(
+      { error: "Failed to mark lead as worked" },
+      { status: 500 },
+    );
   }
 }

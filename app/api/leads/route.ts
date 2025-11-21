@@ -16,6 +16,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
 
     const owner = searchParams.get("owner") ?? undefined;
+    if (!owner) {
+      return NextResponse.json({ error: "Missing owner parameter" }, { status: 400 });
+    }
 
     const routeTypeRaw = searchParams.get("routeType");
     const routeType = routeTypeRaw ? (routeTypeRaw as LeadRouteType) : undefined;

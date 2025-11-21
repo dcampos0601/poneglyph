@@ -1,3 +1,4 @@
+// lib/db.ts
 import {
   PrismaClient,
   Prisma,
@@ -6,26 +7,21 @@ import {
   PlayerType,
 } from "@prisma/client";
 
-// Avoid creating multiple instances in dev (Next App Router)
-declare global {
-  var prisma: PrismaClient | undefined;
-}
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
+};
 
 export const prisma =
-  globalThis.prisma ??
+  globalForPrisma.prisma ??
   new PrismaClient({
     log: ["warn", "error"],
   });
 
-if (!globalThis.prisma) {
-  globalThis.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
 
-// ---- Supporting types ----
-
-export type LeadWithAccount = Prisma.LeadGetPayload<{
-  include: { account: true };
-}>;
+// ------- Tipos de filtros para /sales --------
 
 export type LeadFilters = {
   owner?: string;
@@ -37,12 +33,10 @@ export type LeadFilters = {
   search?: string;
 };
 
-// ---- Domain functions ----
-
 export async function getLeadsForOwner(
-  owner: string | undefined,
+  owner: string,
   filters: LeadFilters = {},
-): Promise<LeadWithAccount[]> {
+) {
   const {
     routeType,
     workStatus,
@@ -52,11 +46,9 @@ export async function getLeadsForOwner(
     search,
   } = filters;
 
-  const where: Prisma.LeadWhereInput = {};
-
-  if (owner) {
-    where.leadOwner = owner;
-  }
+  const where: Prisma.LeadWhereInput = {
+    leadOwner: owner,
+  };
 
   if (routeType) {
     where.routeType = routeType;
@@ -66,55 +58,50 @@ export async function getLeadsForOwner(
     where.workStatus = { in: workStatus };
   }
 
-  // Filters based on Account (ICP)
-  const accountWhere: Prisma.AccountWhereInput = {};
-  if (market) {
-    accountWhere.market = market;
-  }
-  if (minFitScore !== undefined) {
-    accountWhere.fitScore = { gte: minFitScore };
-  }
-  if (playerTypes && playerTypes.length > 0) {
-    accountWhere.playerType = { in: playerTypes };
-  }
-  if (Object.keys(accountWhere).length > 0) {
-    where.account = accountWhere;
-  }
-
   if (search && search.trim().length > 0) {
-    const q = search.trim();
+    const term = search.trim();
     where.OR = [
-      { fullName: { contains: q, mode: "insensitive" } },
-      { title: { contains: q, mode: "insensitive" } },
-      {
-        account: {
-          name: { contains: q, mode: "insensitive" },
-        },
-      },
+      { fullName: { contains: term, mode: "insensitive" } },
+      { title: { contains: term, mode: "insensitive" } },
+      { account: { name: { contains: term, mode: "insensitive" } } },
     ];
   }
 
+  const accountWhere: Prisma.AccountWhereInput = {};
+
+  if (market) {
+    accountWhere.market = market;
+  }
+
+  if (minFitScore != null) {
+    accountWhere.fitScore = { gte: minFitScore };
+  }
+
+  if (playerTypes && playerTypes.length > 0) {
+    accountWhere.playerType = { in: playerTypes };
+  }
+
   const leads = await prisma.lead.findMany({
-    where,
+    where: {
+      ...where,
+      ...(Object.keys(accountWhere).length > 0 ? { account: accountWhere } : {}),
+    },
     include: {
       account: true,
     },
     orderBy: [
-      // Note: enums are not ordered as HIGH > MEDIUM > LOW; refine in frontend later.
-      { workStatus: "asc" },
+      { priority: "desc" },
       { lastTouchDate: "asc" },
       { createdAt: "asc" },
     ],
-    take: 200, // safety cap
   });
 
   return leads;
 }
 
-// Mark lead as worked today
-export async function markLeadWorkedToday(
-  leadId: string,
-): Promise<LeadWithAccount> {
+// ------- NUEVO: marcar lead como trabajado hoy --------
+
+export async function markLeadWorkedToday(leadId: string) {
   const existing = await prisma.lead.findUnique({
     where: { id: leadId },
     include: { account: true },
@@ -125,7 +112,6 @@ export async function markLeadWorkedToday(
   }
 
   const now = new Date();
-
   const newStatus =
     existing.workStatus === LeadWorkStatus.PENDING
       ? LeadWorkStatus.IN_PROGRESS

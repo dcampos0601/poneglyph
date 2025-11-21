@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { markLeadWorkedToday } from "@/lib/db";
 
-type RouteParams = { id: string } & Record<string, string>;
+type RouteParams = { id: string };
 
 function extractId(req: NextRequest, params: Partial<RouteParams>) {
   const fromParams =
@@ -22,10 +22,10 @@ function extractId(req: NextRequest, params: Partial<RouteParams>) {
 
 export async function POST(
   req: NextRequest,
-  context: { params: Promise<RouteParams> | RouteParams },
+  context: { params: Promise<RouteParams> },
 ) {
   try {
-    const params = await (context.params as Promise<RouteParams>);
+    const params = await context.params;
     const id = extractId(req, params ?? {});
 
     if (!id) {

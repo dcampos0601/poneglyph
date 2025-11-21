@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import { fileURLToPath } from "url";
 import { parse } from "csv-parse/sync";
 import { PrismaClient, PlayerType, AumBucket } from "@prisma/client";
 
@@ -7,23 +6,22 @@ const prisma = new PrismaClient();
 
 type AccountCsvRow = {
   Account_ID?: string;
-  Account_Name: string;
+  Account_Name?: string;
   Domain?: string;
-  Evidence_URL?: string;
-  Residential_Operation?: string;
-  Multifamily_Exposure?: string;
-  Sunbelt_Flag?: string;
-  Affordable_Only?: string;
-  AUM?: string;
-  AUM_Bucket?: string;
-  Fit_Score?: string;
   Market?: string;
   Country?: string;
   Player_Type?: string;
+  Residential_Operation?: string;
+  Multifamily_Exposure?: string;
+  Affordable_Only?: string;
+  Sunbelt_Flag?: string;
+  AUM_Bucket?: string;
+  Fit_Score?: string;
   Source_List?: string;
   Notes_Analyst?: string;
-  Analyst_Owner?: string;
+  Evidence_URL?: string;
   Last_Updated?: string;
+  Analyst_Owner?: string;
 };
 
 function parseYesNo(value: string | undefined | null): boolean | null {
@@ -70,9 +68,6 @@ async function importAccountsFromCsv(filePath: string) {
     columns: true,
     skip_empty_lines: true,
     trim: true,
-    relax_quotes: true,
-    delimiter: [",", ";"],
-    relax_column_count: true,
   }) as AccountCsvRow[];
 
   for (const row of rows) {
@@ -85,10 +80,8 @@ async function importAccountsFromCsv(filePath: string) {
     }
 
     const fitScore = parseFitScore(row.Fit_Score);
-    const lastUpdated = row.Last_Updated ? new Date(row.Last_Updated) : undefined;
     const playerType = mapPlayerType(row.Player_Type);
-    const rawAum = row.AUM ?? row.AUM_Bucket;
-    const aumBucket = mapAumBucket(rawAum);
+    const aumBucket = mapAumBucket(row.AUM_Bucket);
 
     const data = {
       name: name ?? "Unnamed Account",
@@ -104,8 +97,6 @@ async function importAccountsFromCsv(filePath: string) {
       fitScore,
       sourceList: row.Source_List?.trim() || null,
       notesAnalyst: row.Notes_Analyst?.trim() || null,
-      // Campos no presentes en el schema actual se ignoran: analystOwner, externalId, evidenceUrl
-      lastUpdated: lastUpdated || undefined,
     };
 
     try {
@@ -145,19 +136,12 @@ async function importAccountsFromCsv(filePath: string) {
 async function main() {
   try {
     await importAccountsFromCsv("data/accounts.csv");
-    console.log("Import completed");
+    console.log("Account import completed");
   } catch (err) {
-    console.error("Import failed:", err);
+    console.error("Account import failed:", err);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
-
-if (isDirectRun) {
-  main().catch((err) => {
-    console.error("Fatal import error:", err);
-    process.exit(1);
-  });
-}
+main();

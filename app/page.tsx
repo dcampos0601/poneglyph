@@ -11,7 +11,7 @@ import {
   type LeadFilters,
 } from "@/lib/sheets";
 
-const ownerOptions = MOCK_LEAD_OWNERS.length ? MOCK_LEAD_OWNERS : ["Martin"];
+const ownerOptions = MOCK_LEAD_OWNERS.length ? ["All", ...MOCK_LEAD_OWNERS] : ["All", "Martin"];
 const routeTypeOptions: Array<"All" | RouteType> = [
   "All",
   "Warm",
@@ -115,7 +115,7 @@ export default function SalesConsolePage() {
     setIsLoading(true);
     setError(null);
 
-    getLeadsForOwner(currentOwner, activeFilters)
+    getLeadsForOwner(currentOwner === "All" ? undefined : currentOwner, activeFilters)
       .then((data) => {
         if (!isActive) return;
         setLeads(data);
@@ -300,7 +300,7 @@ export default function SalesConsolePage() {
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Leads for {currentOwner}
+                Leads for {currentOwner === "All" ? "All owners" : currentOwner}
               </h2>
               <p className="text-sm text-slate-500">
                 Sorted by priority and last touch. Update status directly from this table.

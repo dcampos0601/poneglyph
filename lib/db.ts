@@ -34,7 +34,7 @@ export type LeadFilters = {
 };
 
 export async function getLeadsForOwner(
-  owner: string,
+  owner: string | undefined,
   filters: LeadFilters = {},
 ) {
   const {
@@ -46,9 +46,10 @@ export async function getLeadsForOwner(
     search,
   } = filters;
 
-  const where: Prisma.LeadWhereInput = {
-    leadOwner: owner,
-  };
+  const where: Prisma.LeadWhereInput = {};
+  if (owner) {
+    where.leadOwner = owner;
+  }
 
   if (routeType) {
     where.routeType = routeType;

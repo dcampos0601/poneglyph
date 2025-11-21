@@ -228,13 +228,13 @@ const priorityRank: Record<PriorityLevel, number> = {
 };
 
 export async function getLeadsForOwner(
-  owner: string,
+  owner: string | undefined,
   filters: LeadFilters = {},
 ): Promise<Lead[]> {
   const normalizedSearch = filters.search?.toLowerCase().trim();
 
   const filtered = mockLeads
-    .filter((lead) => lead.leadOwner === owner)
+    .filter((lead) => (owner ? lead.leadOwner === owner : true))
     .filter((lead) => {
       if (filters.routeType && lead.routeType !== filters.routeType) {
         return false;

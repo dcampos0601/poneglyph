@@ -47,7 +47,7 @@ type GetLeadsResponse = {
   leads: Lead[];
 };
 
-const OWNERS = ['Martin', 'Capitan', 'Lucia', 'Miguel', 'Other'];
+const OWNERS = ['All', 'Martin', 'Capitan', 'Lucia', 'Miguel', 'Other'];
 
 const PLAYER_FILTERS: Array<{ value: PlayerType | 'ALL'; label: string }> = [
   { value: 'ASSET_MANAGER', label: 'Asset Manager' },
@@ -80,7 +80,7 @@ const playerTypeLabel: Record<PlayerType, string> = {
   OTHER: 'Other',
 };
 
-const playerTypeClasses: Record<PlayerType, string> = {
+  const playerTypeClasses: Record<PlayerType, string> = {
   ASSET_MANAGER: 'bg-slate-100 text-slate-700 border border-slate-200',
   PROPERTY_MANAGEMENT: 'bg-blue-50 text-blue-700 border border-blue-200',
   DEVELOPER: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
@@ -117,7 +117,7 @@ const routeClasses = (route: RouteType) => {
 };
 
 export default function SalesConsolePage() {
-  const [owner, setOwner] = useState<string>('Martin');
+  const [owner, setOwner] = useState<string>('All');
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(false);
   const [workingId, setWorkingId] = useState<string | null>(null);
@@ -133,9 +133,10 @@ export default function SalesConsolePage() {
       setLoading(true);
       setError(null);
       try {
-        const params = new URLSearchParams({
-          owner,
-        });
+        const params = new URLSearchParams();
+        if (owner !== 'All') {
+          params.set('owner', owner);
+        }
 
         const res = await fetch(`/api/leads?${params.toString()}`);
         if (!res.ok) {
@@ -228,12 +229,12 @@ export default function SalesConsolePage() {
               >
                 Account Discovery
               </Link>
-              <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
-                <label className="text-xs uppercase tracking-wide text-slate-500">
-                  Current owner
-                </label>
-                <select
-                  value={owner}
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
+              <label className="text-xs uppercase tracking-wide text-slate-500">
+                Current owner
+              </label>
+              <select
+                value={owner}
                   onChange={(e) => setOwner(e.target.value)}
                   className="border border-slate-200 rounded-md px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >

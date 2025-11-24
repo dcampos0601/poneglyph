@@ -89,7 +89,7 @@ export default function AccountsPage() {
       })
       .catch(() => {
         if (!isActive) return;
-        setError("Unable to load leads right now. Please try again shortly.");
+        setError("Unable to load companies right now. Please try again shortly.");
         setLeads([]);
       })
       .finally(() => {
@@ -125,11 +125,15 @@ export default function AccountsPage() {
   };
 
   const tableStateMessage = useMemo(() => {
-    if (isLoading) return "Loading leads...";
+    if (isLoading) return "Loading companies...";
     if (error) return error;
-    if (!leads.length) return "No leads match the selected filters.";
+    if (!leads.length) return "No companies match the selected filters.";
     return null;
   }, [isLoading, error, leads.length]);
+
+  const totalCompanies = leads.length;
+  const pendingCount = leads.filter((l) => l.workStatus === "Pending").length;
+  const highFitCount = leads.filter((l) => l.fitScore === "High").length;
 
   return (
     <div className="flex min-h-screen bg-slate-100 text-slate-900">
@@ -140,8 +144,10 @@ export default function AccountsPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-slate-900">
                 Poneglyph • SDR Workspace
               </p>
-              <h1 className="text-3xl font-bold text-slate-950 leading-tight">My Leads</h1>
-              <p className="text-sm text-slate-500">Today&apos;s prioritized queue for institutional leads.</p>
+              <h1 className="text-3xl font-bold text-slate-950 leading-tight">My Companies</h1>
+              <p className="text-sm text-slate-500">
+                Portfolio view of institutional accounts and their active leads.
+              </p>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-3">
               <Link
@@ -149,6 +155,12 @@ export default function AccountsPage() {
                 className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
               >
                 Dashboard
+              </Link>
+              <Link
+                href="/import"
+                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                Import Data
               </Link>
               <Link
                 href="/sales"
@@ -176,8 +188,26 @@ export default function AccountsPage() {
           </div>
         </header>
 
+        <section className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total Companies</p>
+            <div className="mt-2 text-2xl font-bold text-slate-900">{totalCompanies}</div>
+            <p className="text-xs text-slate-500 mt-1">Accounts in your portfolio</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pending Review</p>
+            <div className="mt-2 text-2xl font-bold text-slate-900">{pendingCount}</div>
+            <p className="text-xs text-slate-500 mt-1">Awaiting first touch</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">High Fit</p>
+            <div className="mt-2 text-2xl font-bold text-slate-900">{highFitCount}</div>
+            <p className="text-xs text-slate-500 mt-1">Companies with strong fit</p>
+          </div>
+        </section>
+
         <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-5">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex flex-col gap-1">
               <SectionLabel label="Route Type" />
               <select
@@ -234,11 +264,11 @@ export default function AccountsPage() {
                 ))}
               </select>
             </div>
-            <div className="flex flex-col gap-1 lg:col-span-1">
+            <div className="flex flex-col gap-1 flex-1 min-w-[180px]">
               <SectionLabel label="Search" />
               <input
                 type="text"
-                placeholder="Account, lead, title..."
+                placeholder="Company, lead, title..."
                 className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -251,7 +281,7 @@ export default function AccountsPage() {
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Leads for {currentOwner === "All" ? "All owners" : currentOwner}
+                Companies for {currentOwner === "All" ? "All owners" : currentOwner}
               </h2>
               <p className="text-sm text-slate-500">Sorted by priority and last touch.</p>
             </div>
@@ -261,7 +291,7 @@ export default function AccountsPage() {
             <table className="min-w-full divide-y divide-slate-100 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-6 py-3">Account</th>
+                  <th className="px-6 py-3">Company</th>
                   <th className="px-6 py-3">Lead</th>
                   <th className="px-6 py-3">Market</th>
                   <th className="px-6 py-3">Fit</th>

@@ -1,46 +1,43 @@
-# Poneglyph – Sales Console & Executive Dashboard
+# Poneglyph — Executive Dashboard, Accounts, Leads
+Internal SDR workspace for Andes STR. Next.js (App Router), TypeScript, Tailwind, Prisma (PostgreSQL).
 
-Internal SDR workspace for Andes STR built with Next.js (App Router), TypeScript, Prisma, and Tailwind. It provides a Sales Console for day‑to‑day lead work and an Executive Dashboard for leadership visibility.
+## Features (rutas principales)
+- `/` Executive Dashboard (resumen, métricas, action-required).
+- `/accounts` Vista de compañías (portfolio de cuentas + leads activos, filtros, import).
+- `/sales` Leads Console (filtros completos, “mark worked”, HubSpot links).
+- `/import` + `/import/accounts` + `/import/leads` Formularios de carga CSV/XLSX (API `/api/import`).
+- APIs: `GET /api/leads` (con filtros), `POST /api/leads/[id]/work` (actualiza lastTouchDate y estado).
 
-## Features
-- Sales Console (`/sales`): filters by owner, player type, route, status, market, search; inline “mark worked” and HubSpot link actions.
-- Executive Dashboard (`/dashboard`): priority queue view with quick actions.
-- API endpoints:
-  - `GET /api/leads`: filtered leads.
-  - `POST /api/leads/[id]/work`: mark a lead as worked (updates status and last touch).
-- Prisma models for AccountList, Account, Lead; PlayerType includes `PROPERTY_MANAGEMENT`.
-- CSV import scripts for accounts and leads (upsert by domain/name and account/email).
+## Variables de entorno
+- `DATABASE_URL` (Postgres remoto; Vercel no puede acceder a tu DB local).
 
-## Tech Stack
-- Next.js 16 (App Router), TypeScript, React 18
-- Prisma ORM (PostgreSQL)
-- Tailwind CSS
-
-## Development
+## Bash/PowerShell útiles
 ```bash
+# Instalar deps
 npm install
-npm run dev        # start dev server
-npm run build      # production build
+
+# Desarrollo local
+npm run dev
+
+# Build producción
+npm run build
+
+# Prisma
+npx prisma generate          # regenerar cliente
+npx prisma db push           # aplicar schema al Postgres configurado
+
+# Scripts de import (CLI)
+npx ts-node scripts/import-accounts-from-csv.ts   # usa data/accounts.csv
+npx ts-node scripts/import-leads-from-csv.ts      # usa data/leads.csv
+
+# Script de conexión rápida (sin mock data)
+npx ts-node scripts/test-db.ts
+
+# Deploy con Vercel CLI (si la tienes configurada)
+npx vercel --prod
 ```
 
-### Database
-Set `DATABASE_URL` in `.env` for Postgres. Generate client after schema changes:
-```bash
-npx prisma generate
-```
-
-### Useful Scripts
-- `scripts/test-db.ts`: quick Prisma connectivity check (creates AccountList + Account).
-- `scripts/import-from-csv.ts`: import accounts from `data/accounts.csv`.
-- `scripts/import-leads-from-csv.ts`: import leads from `data/leads.csv`.
-
-## Paths
-- Main console: `app/page.tsx`
-- Sales console: `app/sales/page.tsx`
-- Executive dashboard: `app/dashboard/page.tsx`
-- Leads API: `app/api/leads/route.ts`, `app/api/leads/[id]/work/route.ts`
-- Prisma schema: `prisma/schema.prisma`
-
-## Notes
-- Owner query param `owner=All` is treated as no owner filter.
-- “Mark worked” sets `lastTouchDate` to now and moves `PENDING` → `IN_PROGRESS`.
+## Notas
+- Usa un Postgres accesible desde Vercel; ajusta `DATABASE_URL` en Vercel y en `.env` local.
+- `owner=All` en `/api/leads` se interpreta como sin filtro de owner.
+- “Mark worked” pone `lastTouchDate = now` y si estaba `PENDING` pasa a `IN_PROGRESS`.
